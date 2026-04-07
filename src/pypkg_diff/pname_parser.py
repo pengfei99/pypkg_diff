@@ -1,9 +1,10 @@
 from pathlib import Path
+import sqlite3
 
 import pandas as pd
 import re
 
-def get_pkg_names_from_pypi(file_path:Path) -> list[str]:
+def get_pkg_names_from_pypi_file(file_path:Path) -> list[str]:
     """
     This function read a csv file which describes pypi package names in casd pypi server
     The first column is the package name
@@ -38,6 +39,36 @@ def get_pkg_names_from_pypi(file_path:Path) -> list[str]:
 
     print(f"Error: Could not decode {file_path} with supported encodings.")
     return []
+
+def get_pkg_names_from_pypi_db(db_path:Path) -> list[str]:
+    """
+    This function read a sqlite file, it will read the table 'packages' and column 'name', return all rows as a list
+    :param db_path: The sqlite file path
+    :return:
+    """
+    path = Path(db_path)
+    if not path.is_file():
+        print(f"Error: Database file '{db_path}' not found.")
+        return []
+
+    # Using 'with' as a context manager ensures the connection closes automatically
+    try:
+        with sqlite3.connect(db_path) as conn:
+            cursor = conn.cursor()
+
+            # Best Practice: Explicitly select only the column you need
+            cursor.execute("SELECT name FROM packages")
+
+            # cursor.fetchall() returns a list of tuples: [('affine',), ('pandas',)]
+            # We use a list comprehension to "flatten" it into a list of strings
+            return [row[0] for row in cursor.fetchall()]
+
+    except sqlite3.OperationalError as e:
+        print(f"Database error: {e}")
+        return []
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+        return []
 
 def get_pkg_names_from_req(file_path: Path) -> list[str]:
     """
