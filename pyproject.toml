@@ -1,0 +1,27 @@
+[project]
+name = "pypkg-diff"
+version = "0.1.0"
+description = "A tool to compare python package requirement files"
+readme = "README.md"
+requires-python = ">=3.12"  # Note: 3.14 is very futuristic; 3.12 is current stable
+license = {text = "MIT"}
+authors = [
+    {name = "Your Name", email = "your.email@example.com"}
+]
+dependencies = [
+    "hatchling>=1.29.0",
+    "pandas>=2.0.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.0",
+    "pytest-cov",  # Good practice to include coverage for testing
+]
+
+[tool.uv]
+default-groups = "all"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
